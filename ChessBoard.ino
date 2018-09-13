@@ -14,7 +14,7 @@ a partir del puerto 5 ya que mas adelante se utilizara una matiz de 8x8
 donde ira ubicada la cuadricula del tablero
 
 */
-unsigned char actualboard[64]; //Aqui guardare el estado actual del tablero
+unsigned char actualboard[64]; //Aqui guardare el estado actual del tablero //CAMBIAR POR UN ARREGLO MULTIDIMENCIONAL
 
 //Definicion del tablero
 const byte PuertoFilas[7] = {12,11,10,9};
@@ -50,6 +50,24 @@ void BoardStatus()
   y al finalizar se cruzan los datos para conocer todos los escaques ocupados.
   La condicion normal de los escaques es Normal Abierto
   */
+  //Barro todas las filas
+  for (char fila=0;fila<8; fila++)
+  {
+    pinMode(PuertoFilas[fila],INPUT); //Fila como entrada
+    digitalWrite(PuertoFilas[fila],HIGH); //Pull-UP software
+    //por cada fila barro todas las columnas
+    for (char columna=0;columna<8;columna++)
+    {
+      pinMode(PuertoColumnas[columna],OUTPUT); //Columna como salida
+      digitalWrite(PuertoColumnas[columna],HIGH); //Columna en nivel Alto
+      if (PuertoFilas[fila] ==HIGH) //Si detecto un estado alto, entonces se esta pulsada la interseccion entre fila y columna actual
+      {
+        //grabo el estado en un arreglo multidimencional que me permita leer despues un high en la intersecion fila columna
+      }
+    }
+  }
+  
+
 
 
 }
