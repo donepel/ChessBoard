@@ -14,22 +14,35 @@ a partir del puerto 5 ya que mas adelante se utilizara una matiz de 8x8
 donde ira ubicada la cuadricula del tablero
 
 */
-unsigned char actualboard[64]; //Aqui guardare el estado actual del tablero //CAMBIAR POR UN ARREGLO MULTIDIMENCIONAL
 
-//Definicion del tablero
-const byte PuertoFilas[7] = {12,11,10,9};
-const byte PuertoColumnas[7] = {8,7,6,5};
+//Variables del estado de tablero
+unsigned char Tablero[8][8],TableroNew[8][8];
+
+//Definicion del tablero fisco
+const byte PuertoFilas[8] = {22,23,24,25,26,27,28,29};
+const byte PuertoColumnas[8] = {30,31,32,33,34,35,36,37};
 
 void setup() 
 {
-   Serial.begin(9600);
+   Serial.begin(115200);
 }
 
 void loop() 
 {   
-  Serial.println("Lectura de tablero");
+    Serial.println("Lectura de tablero");
   while(1)
   {
+    Serial.println("");
+    //Serial.println("nueva lectura");
+    BoardStatus();
+    for (char f=0;f<4;f++)
+    {
+      for (char c=0;c<4;c++)
+      {
+        Serial.print(TableroNew[f][c]);
+      }
+    }
+    delay(100);
   }
 }
 
@@ -50,24 +63,25 @@ void BoardStatus()
   y al finalizar se cruzan los datos para conocer todos los escaques ocupados.
   La condicion normal de los escaques es Normal Abierto
   */
-  //Barro todas las filas
-  for (char fila=0;fila<8; fila++)
+  unsigned char fila,columna=0;
+  for (fila=0;fila<8;fila++)//Barro todas las filas
   {
-    pinMode(PuertoFilas[fila],INPUT); //Fila como entrada
-    digitalWrite(PuertoFilas[fila],HIGH); //Pull-UP software
-    //por cada fila barro todas las columnas
-    for (char columna=0;columna<8;columna++)
-    {
-      pinMode(PuertoColumnas[columna],OUTPUT); //Columna como salida
-      digitalWrite(PuertoColumnas[columna],HIGH); //Columna en nivel Alto
-      if (PuertoFilas[fila] ==HIGH) //Si detecto un estado alto, entonces se esta pulsada la interseccion entre fila y columna actual
+    pinMode(PuertoFilas[fila],INPUT); //Seteo fila como entrada
+    digitalWrite(PuertoFilas[fila],HIGH); //Pull-UP software       
+    for (columna=0;columna<8;columna++) //Por cada fila barro todas las columnas en busqueda de estados bajos
+    {   
+      pinMode(PuertoColumnas[columna],OUTPUT); //Seteo columna como salida
+      digitalWrite(PuertoColumnas[columna],LOW); //Columna en nivel BAJO
+      if (digitalRead(PuertoFilas[fila]) == LOW) //Si detecto un estado bajo, entonces esta pulsada la interseccion entre fila y columna actual
       {
-        //grabo el estado en un arreglo multidimencional que me permita leer despues un high en la intersecion fila columna
+         TableroNew[fila][columna]=HIGH; //Flag de escaque ocupado
+         digitalWrite(PuertoColumnas[columna],HIGH); //Apago la columna para que no altere futuras mediciones
+      }
+      else //Si no, lo marco con LOW de forma tal que se entienda que esta libre
+      {  
+        TableroNew[fila][columna]=LOW; //Flag de escaque libre
+        digitalWrite(PuertoColumnas[columna],HIGH); //Apago la columna para que no altere futuras mediciones
       }
     }
   }
-  
-
-
-
 }
